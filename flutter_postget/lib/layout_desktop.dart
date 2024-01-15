@@ -1,40 +1,39 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_cupertino_desktop_kit/cdk.dart';
+import 'package:flutter_postget/chat_message.dart';
 import 'package:provider/provider.dart';
+import 'package:velocity_x/velocity_x.dart';
 
 import 'app_data.dart';
 
 class LayoutDesktop extends StatefulWidget {
-  const LayoutDesktop({super.key, required this.title});
-
-  final String title;
+  const LayoutDesktop({super.key});
 
   @override
   State<LayoutDesktop> createState() => _LayoutDesktopState();
 }
 
 class _LayoutDesktopState extends State<LayoutDesktop> {
-  // Return a custom button
-  Widget buildCustomButton(String buttonText, VoidCallback onPressedAction) {
-    return SizedBox(
-      width: 150, // Amplada total de l'espai
-      child: Align(
-        alignment: Alignment.centerRight, // Alineació a la dreta
-        child: CDKButton(
-          style: CDKButtonStyle.normal,
-          isLarge: false,
-          onPressed: onPressedAction,
-          child: Text(buttonText),
-        ),
-      ),
-    );
+  final TextEditingController _controller = TextEditingController();
+  final List<ChatMessage> _messages = [];
+
+  void _sendMessage() {
+    ChatMessage _message = ChatMessage(text: _controller.text, sender: "user");
+
+    setState(() {
+      _messages.insert(0, _message);
+    });
+
+    _controller.clear();
   }
 
-  // Funció per seleccionar un arxiu
+  // Return a custom button
+
+  // Función para seleccionar un archivo
   Future<File> pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
@@ -42,19 +41,41 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
       File file = File(result.files.single.path!);
       return file;
     } else {
-      throw Exception("No s'ha seleccionat cap arxiu.");
+      throw Exception("No se ha seleccionado ningún archivo.");
     }
   }
 
-  // Funció per carregar l'arxiu seleccionat amb una sol·licitud POST
+  // Función para cargar el archivo seleccionado con una solicitud POST
   Future<void> uploadFile(AppData appData) async {
     try {
       appData.load("POST", selectedFile: await pickFile());
     } catch (e) {
       if (kDebugMode) {
-        print("Excepció (uploadFile): $e");
+        print("Excepción (uploadFile): $e");
       }
     }
+  }
+
+  Widget _builderTextComposer() {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: _controller,
+            onSubmitted: (value) {
+              _sendMessage();
+            },
+            decoration: InputDecoration.collapsed(hintText: "Send a message"),
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.send),
+          onPressed: () {
+            _sendMessage();
+          },
+        ),
+      ],
+    ).px64();
   }
 
   @override
@@ -82,69 +103,32 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
       stringFile = "File: ${appData.dataFile}";
     }
 
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: Text(widget.title),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center, // Vertical
-        children: <Widget>[
-          Container(
-            height: 50,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              buildCustomButton('Crida tipus GET', () {
-                appData.load("GET");
-              }),
-              Container(
-                width: 10,
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text("IetiChat"),
+        ),
+        body: SafeArea(
+          child: Column(
+            children: [
+              Flexible(
+                child: ListView.builder(
+                  reverse: true,
+                  padding: Vx.m8,
+                  itemCount: _messages.length,
+                  itemBuilder: (context, index) {
+                    return _messages[index];
+                    //return ListTile(
+                    //  title: _messages[index],
+                    //);
+                  },
+                ),
               ),
-              Expanded(
-                  child: Text(stringGet,
-                      softWrap: true, overflow: TextOverflow.visible)),
+              Container(
+                decoration: BoxDecoration(color: context.cardColor),
+                child: _builderTextComposer(),
+              ),
             ],
           ),
-          Container(
-            height: 20,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              buildCustomButton('Crida tipus POST', () {
-                uploadFile(appData);
-              }),
-              Container(
-                width: 10,
-              ),
-              Expanded(
-                  child: Text(stringPost,
-                      softWrap: true, overflow: TextOverflow.visible)),
-            ],
-          ),
-          Container(
-            height: 20,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              buildCustomButton('Llegir arxiu .JSON', () {
-                appData.load("FILE");
-              }),
-              Container(
-                width: 10,
-              ),
-              Expanded(
-                  child: Text(stringFile,
-                      softWrap: true, overflow: TextOverflow.visible)),
-            ],
-          ),
-        ],
-      ),
-    );
+        ));
   }
 }

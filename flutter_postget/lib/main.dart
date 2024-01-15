@@ -18,8 +18,6 @@ void main() async {
     print(e);
   }
 
-
-
   // Define the app as a ChangeNotifierProvider
   runApp(
     ChangeNotifierProvider(
