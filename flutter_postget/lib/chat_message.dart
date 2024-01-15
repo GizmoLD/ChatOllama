@@ -21,7 +21,7 @@ class ChatMessage extends StatelessWidget {
         children: [
           Text(
             sender,
-            style: Theme.of(context).textTheme.subtitle1,
+            style: Theme.of(context).textTheme.titleMedium,
           ),
           Container(
             margin: const EdgeInsets.only(top: 5.0),
