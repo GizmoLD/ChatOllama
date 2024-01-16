@@ -57,19 +57,19 @@ class AppData with ChangeNotifier {
 
   // Funció per fer crides tipus 'POST' amb un arxiu adjunt,
   //i agafar la informació a mida que es va rebent
-  Future<String> loadHttpPostByChunks(String url, File file) async {
+  Future<String> loadHttpPostByChunks(String url /*, File file*/) async {
     var request = http.MultipartRequest('POST', Uri.parse(url));
 
     // Afegir les dades JSON com a part del formulari
-    request.fields['data'] = '{"type":"test"}';
+    request.fields['data'] = '{"type":"conversa"}';
 
     // Adjunta l'arxiu com a part del formulari
-    var stream = http.ByteStream(file.openRead());
-    var length = await file.length();
-    var multipartFile = http.MultipartFile('file', stream, length,
-        filename: file.path.split('/').last,
-        contentType: MediaType('application', 'octet-stream'));
-    request.files.add(multipartFile);
+    //var stream = http.ByteStream(file.openRead());
+    // var length = await file.length();
+    // var multipartFile = http.MultipartFile('file', stream, length,
+    //     filename: file.path.split('/').last,
+    //     contentType: MediaType('application', 'octet-stream'));
+    // request.files.add(multipartFile);
 
     var response = await request.send();
 
@@ -122,7 +122,7 @@ class AppData with ChangeNotifier {
         notifyListeners();
 
         dataPost = await loadHttpPostByChunks(
-            'http://localhost:3000/data', selectedFile!);
+            'http://localhost:3000/data' /* , selectedFile! */);
 
         loadingPost = false;
         notifyListeners();

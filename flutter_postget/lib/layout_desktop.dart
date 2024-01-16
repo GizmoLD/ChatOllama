@@ -21,11 +21,14 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
   final TextEditingController _controller = TextEditingController();
   final List<ChatMessage> _messages = [];
 
-  void _sendMessage() {
-    ChatMessage _message = ChatMessage(text: _controller.text, sender: "user");
+  void _sendMessage(String messageSender, String messageText) {
+    ChatMessage _message =
+        ChatMessage(text: messageText, sender: messageSender);
 
     setState(() {
-      _messages.insert(0, _message);
+      if (messageText.isNotEmpty) {
+        _messages.insert(0, _message);
+      }
     });
 
     _controller.clear();
@@ -56,26 +59,49 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
     }
   }
 
-  Widget _builderTextComposer() {
-    return Row(
-      children: [
-        Expanded(
-          child: TextField(
-            controller: _controller,
-            onSubmitted: (value) {
-              _sendMessage();
-            },
-            decoration: InputDecoration.collapsed(hintText: "Send a message"),
+  Widget _builderTextComposer(AppData appData) {
+    return Container(
+      margin: const EdgeInsets.symmetric(
+          horizontal: 8.0), // Adjust the horizontal margin as needed
+      decoration: BoxDecoration(
+        borderRadius:
+            BorderRadius.circular(20.0), // Set your desired border radius
+        border: Border.all(
+            color: Colors.grey), // Add a border for better visibility
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _controller,
+              onSubmitted: (value) {
+                _sendMessage("User", _controller.text);
+                appData.load("POST");
+              },
+              decoration: const InputDecoration(
+                contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 8.0), // Adjust padding as needed
+                hintText: "Send a message",
+                border: InputBorder.none, // Remove the default border
+              ),
+            ),
           ),
-        ),
-        IconButton(
-          icon: const Icon(Icons.send),
-          onPressed: () {
-            _sendMessage();
-          },
-        ),
-      ],
-    ).px64();
+          IconButton(
+            icon: const Icon(Icons.send),
+            onPressed: () {
+              _sendMessage("User", _controller.text);
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.upload_file),
+            onPressed: () {
+              //uploadFile(appData);
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -124,9 +150,17 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
                 ),
               ),
               Container(
-                decoration: BoxDecoration(color: context.cardColor),
-                child: _builderTextComposer(),
-              ),
+                  decoration: BoxDecoration(color: context.cardColor),
+                  child: Padding(
+                    padding: EdgeInsetsDirectional.only(bottom: 4),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _builderTextComposer(appData),
+                        ),
+                      ],
+                    ),
+                  )),
             ],
           ),
         ));

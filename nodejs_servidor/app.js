@@ -108,7 +108,13 @@ app.post('/data', upload.single('file'), async (req, res) => {
     res.write("POST Second line\n")
     await new Promise(resolve => setTimeout(resolve, 1000))
     res.end("POST Last line\n")
-  } else {
+  } else if (objPost.type === 'conversa') {
+    console.log('Petició de conversa')
+    console.log(objPost.textPost)
+  } else if (objPost.type === 'imatge') {
+
+  }
+  else {
     res.status(400).send('Sol·licitud incorrecta.')
   }
 })
