@@ -96,7 +96,7 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
           IconButton(
             icon: const Icon(Icons.upload_file),
             onPressed: () {
-              //uploadFile(appData);
+              pickFile();
             },
           ),
         ],
@@ -109,7 +109,7 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
     AppData appData = Provider.of<AppData>(context);
 
     String stringGet = "";
-    if (appData.loadingGet) {
+    if (appData.loadingGet && appData.dataGet == "") {
       stringGet = "Loading ...";
     } else if (appData.dataGet != null) {
       stringGet = "GET: ${appData.dataGet.toString()}";
@@ -130,13 +130,21 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
     }
 
     return Scaffold(
-        appBar: AppBar(
-          title: const Text("IetiChat"),
-        ),
-        body: SafeArea(
-          child: Column(
-            children: [
-              Flexible(
+      appBar: AppBar(
+        title: const Text("IetiChat"),
+        centerTitle: true,
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Flexible(
+              child: Container(
+                margin: const EdgeInsets.only(
+                    left: 20, top: 20, right: 20, bottom: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  color: Colors.blueGrey[200],
+                ),
                 child: ListView.builder(
                   reverse: true,
                   padding: Vx.m8,
@@ -149,20 +157,24 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
                   },
                 ),
               ),
-              Container(
-                  decoration: BoxDecoration(color: context.cardColor),
-                  child: Padding(
-                    padding: EdgeInsetsDirectional.only(bottom: 4),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: _builderTextComposer(appData),
-                        ),
-                      ],
+            ),
+            Container(
+              decoration: BoxDecoration(color: context.cardColor),
+              child: Padding(
+                padding:
+                    EdgeInsetsDirectional.only(start: 20, end: 20, bottom: 10),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _builderTextComposer(appData),
                     ),
-                  )),
-            ],
-          ),
-        ));
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

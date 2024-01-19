@@ -7,6 +7,12 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
+/*
+- Convertir el mensaje en json
+- Enviar el json y abrirlo en el servidor
+
+*/
+
 class AppData with ChangeNotifier {
   // Access appData globaly with:
   // AppData appData = Provider.of<AppData>(context);
@@ -57,7 +63,7 @@ class AppData with ChangeNotifier {
 
   // Funció per fer crides tipus 'POST' amb un arxiu adjunt,
   //i agafar la informació a mida que es va rebent
-  Future<String> loadHttpPostByChunks(String url /*, File file*/) async {
+  Future<String> loadHttpPostByChunks(String url, File file) async {
     var request = http.MultipartRequest('POST', Uri.parse(url));
 
     // Afegir les dades JSON com a part del formulari
@@ -122,7 +128,7 @@ class AppData with ChangeNotifier {
         notifyListeners();
 
         dataPost = await loadHttpPostByChunks(
-            'http://localhost:3000/data' /* , selectedFile! */);
+            'http://localhost:3000/data', selectedFile!);
 
         loadingPost = false;
         notifyListeners();
