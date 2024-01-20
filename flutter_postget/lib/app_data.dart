@@ -70,12 +70,12 @@ class AppData with ChangeNotifier {
     request.fields['data'] = '{"type":"conversa"}';
 
     // Adjunta l'arxiu com a part del formulari
-    //var stream = http.ByteStream(file.openRead());
-    // var length = await file.length();
-    // var multipartFile = http.MultipartFile('file', stream, length,
-    //     filename: file.path.split('/').last,
-    //     contentType: MediaType('application', 'octet-stream'));
-    // request.files.add(multipartFile);
+    var stream = http.ByteStream(file.openRead());
+    var length = await file.length();
+    var multipartFile = http.MultipartFile('file', stream, length,
+        filename: file.path.split('/').last,
+        contentType: MediaType('application', 'octet-stream'));
+    request.files.add(multipartFile);
 
     var response = await request.send();
 

@@ -96,7 +96,7 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
           IconButton(
             icon: const Icon(Icons.upload_file),
             onPressed: () {
-              pickFile();
+              uploadFile(appData);
             },
           ),
         ],
