@@ -21,17 +21,40 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
   final TextEditingController _controller = TextEditingController();
   final List<ChatMessage> _messages = [];
 
-  void _sendMessage(String messageSender, String messageText) {
+  void _sendMessage(
+      AppData appData, String messageSender, String messageText) async {
+    // Create a message object
     ChatMessage _message =
         ChatMessage(text: messageText, sender: messageSender);
 
+    // Update UI with the new message
     setState(() {
       if (messageText.isNotEmpty) {
         _messages.insert(0, _message);
       }
     });
 
+    // Clear the text input
     _controller.clear();
+
+    try {
+      if (messageText.isNotEmpty) {
+        // If the message is text, send it as 'conversa' type
+        appData.load("POST",
+            selectedFile: null,
+            messageType: 'conversa',
+            messageText: messageText);
+      } else {
+        // If the message is a file, send it as 'imatge' type
+        File selectedFile = await pickFile();
+        appData.load("POST",
+            selectedFile: selectedFile, messageType: 'imatge', messageText: '');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Excepción (sendMessage): $e");
+      }
+    }
   }
 
   // Return a custom button
@@ -75,7 +98,7 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
             child: TextField(
               controller: _controller,
               onSubmitted: (value) {
-                _sendMessage("User", _controller.text);
+                _sendMessage(appData, "User", _controller.text);
                 appData.load("POST");
               },
               decoration: const InputDecoration(
@@ -90,7 +113,7 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
           IconButton(
             icon: const Icon(Icons.send),
             onPressed: () {
-              _sendMessage("User", _controller.text);
+              _sendMessage(appData, "User", _controller.text);
             },
           ),
           IconButton(

@@ -63,12 +63,13 @@ class AppData with ChangeNotifier {
 
   // Funció per fer crides tipus 'POST' amb un arxiu adjunt,
   //i agafar la informació a mida que es va rebent
-  Future<String> loadHttpPostByChunks(String url, File file) async {
+  Future<String> loadHttpPostByChunks(
+      String url, File file, String messageType, String messageText) async {
     var request = http.MultipartRequest('POST', Uri.parse(url));
 
     // Afegir les dades JSON com a part del formulari
-    request.fields['data'] = '{"type":"conversa"}';
-
+    request.fields['data'] =
+        '{"type":"$messageType", "message":"$messageText"}';
     // Adjunta l'arxiu com a part del formulari
     var stream = http.ByteStream(file.openRead());
     var length = await file.length();
@@ -108,27 +109,27 @@ class AppData with ChangeNotifier {
   }
 
   // Carregar dades segons el tipus que es demana
-  void load(String type, {File? selectedFile}) async {
+  void load(String type,
+      {File? selectedFile,
+      String messageType = '',
+      String messageText = ''}) async {
     switch (type) {
       case 'GET':
-        loadingGet = true;
+        loadingPost = true;
         notifyListeners();
 
-        // TODO: Cal modificar el funcionament d'aquí
-        // per tal d'actualitzar el valor de 'dataGet' a mida que es va rebent
-        // la informació del servidor, enlloc de mostrar 'Loading ...'
-        dataGet = await loadHttpGetByChunks(
-            'http://localhost:3000/llistat?cerca=motos&color=vermell');
+        dataPost = await loadHttpPostByChunks('http://localhost:3000/data',
+            selectedFile!, messageType, messageText);
 
-        loadingGet = false;
+        loadingPost = false;
         notifyListeners();
         break;
       case 'POST':
         loadingPost = true;
         notifyListeners();
 
-        dataPost = await loadHttpPostByChunks(
-            'http://localhost:3000/data', selectedFile!);
+        dataPost = await loadHttpPostByChunks('http://localhost:3000/data',
+            selectedFile!, messageType, messageText);
 
         loadingPost = false;
         notifyListeners();

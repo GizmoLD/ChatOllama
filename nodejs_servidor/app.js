@@ -56,9 +56,9 @@ async function getIeti(req, res) {
 // async function getLlistat(req, res) {
 //   let query = url.parse(req.url, true).query;
 
-  // Aquí s'executen totes les accions necessaries
-  // però tenint en compte els valors dels variables de la URL
-  // que guardem a l'objecte 'query'
+// Aquí s'executen totes les accions necessaries
+// però tenint en compte els valors dels variables de la URL
+// que guardem a l'objecte 'query'
 
 //   if (query.cerca && query.color) {
 //     // Així es retorna un text per parts (chunks)
@@ -115,7 +115,7 @@ app.post('/data', upload.single('file'), async (req, res) => {
     res.end("POST Last line\n")
   } else if (objPost.type === 'conversa') {
     console.log('Petició de conversa')
-    console.log(objPost.message)
+    console.log('Received message:', objPost.message);
   } else if (objPost.type === 'imatge') {
 
   }
