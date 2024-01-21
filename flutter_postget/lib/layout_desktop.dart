@@ -34,13 +34,11 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
       }
     });
 
-    // Clear the text input
-    _controller.clear();
-
     try {
       if (messageText.isNotEmpty) {
         // If the message is text, send it as 'conversa' type
-        appData.load("POST",
+        print("aaaaa");
+        appData.load('POST',
             selectedFile: null,
             messageType: 'conversa',
             messageText: messageText);
@@ -55,6 +53,8 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
         print("Excepción (sendMessage): $e");
       }
     }
+    // Clear the text input
+    _controller.clear();
   }
 
   // Return a custom button
@@ -74,7 +74,8 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
   // Función para cargar el archivo seleccionado con una solicitud POST
   Future<void> uploadFile(AppData appData) async {
     try {
-      appData.load("POST", selectedFile: await pickFile());
+      appData.load("POST",
+          selectedFile: await pickFile(), messageType: '', messageText: '');
     } catch (e) {
       if (kDebugMode) {
         print("Excepción (uploadFile): $e");
@@ -99,7 +100,6 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
               controller: _controller,
               onSubmitted: (value) {
                 _sendMessage(appData, "User", _controller.text);
-                appData.load("POST");
               },
               decoration: const InputDecoration(
                 contentPadding: EdgeInsets.symmetric(
@@ -174,9 +174,6 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
                   itemCount: _messages.length,
                   itemBuilder: (context, index) {
                     return _messages[index];
-                    //return ListTile(
-                    //  title: _messages[index],
-                    //);
                   },
                 ),
               ),
@@ -184,8 +181,8 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
             Container(
               decoration: BoxDecoration(color: context.cardColor),
               child: Padding(
-                padding:
-                    EdgeInsetsDirectional.only(start: 20, end: 20, bottom: 10),
+                padding: const EdgeInsetsDirectional.only(
+                    start: 20, end: 20, bottom: 10),
                 child: Row(
                   children: [
                     Expanded(

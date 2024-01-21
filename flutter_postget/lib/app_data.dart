@@ -111,8 +111,8 @@ class AppData with ChangeNotifier {
   // Carregar dades segons el tipus que es demana
   void load(String type,
       {File? selectedFile,
-      String messageType = '',
-      String messageText = ''}) async {
+      required String messageType,
+      required String messageText}) async {
     switch (type) {
       case 'GET':
         loadingPost = true;
