@@ -24,6 +24,7 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
   void _sendMessage(
       AppData appData, String messageSender, String messageText) async {
     // Create a message object
+
     ChatMessage _message =
         ChatMessage(text: messageText, sender: messageSender);
 
@@ -45,7 +46,7 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
       } else {
         // If the message is a file, send it as 'imatge' type
         File selectedFile = await pickFile();
-        appData.load("POST",
+        appData.load('POST',
             selectedFile: selectedFile, messageType: 'imatge', messageText: '');
       }
     } catch (e) {
@@ -91,7 +92,8 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
         borderRadius:
             BorderRadius.circular(20.0), // Set your desired border radius
         border: Border.all(
-            color: Colors.grey), // Add a border for better visibility
+            color: const Color.fromARGB(
+                255, 204, 204, 204)), // Add a border for better visibility
       ),
       child: Row(
         children: [
@@ -109,6 +111,14 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
                 border: InputBorder.none, // Remove the default border
               ),
             ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.stop),
+            onPressed: () {
+              // Enviar un GET para parar la respuesta
+              appData.load("GET",
+                  selectedFile: null, messageType: '', messageText: '');
+            },
           ),
           IconButton(
             icon: const Icon(Icons.send),

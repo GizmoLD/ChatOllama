@@ -36,6 +36,8 @@ async function getLlistat(req, res) {
 }
 
 app.post("/data", upload.single("file"), async (req, res) => {
+  console.log("Solicitud recibida correctamente.");
+  print("aaa");
   const textPost = req.body;
   const uploadedFile = req.file;
   let objPost = {};
@@ -49,6 +51,7 @@ app.post("/data", upload.single("file"), async (req, res) => {
   }
 
   if (objPost.type === 'conversa') {
+    console.log("Solicitud de tipo 'conversa' recibida correctamente.");
     if (uploadedFile) {
       const fileContent = uploadedFile.buffer.toString("utf-8");
 

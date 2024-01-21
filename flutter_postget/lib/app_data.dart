@@ -68,8 +68,7 @@ class AppData with ChangeNotifier {
     var request = http.MultipartRequest('POST', Uri.parse(url));
 
     // Afegir les dades JSON com a part del formulari
-    request.fields['data'] =
-        '{"type":"$messageType", "message":"$messageText"}';
+    request.fields['data'] = '{"type":"conversa"}';
     // Adjunta l'arxiu com a part del formulari
     var stream = http.ByteStream(file.openRead());
     var length = await file.length();
@@ -129,7 +128,7 @@ class AppData with ChangeNotifier {
         notifyListeners();
 
         dataPost = await loadHttpPostByChunks('http://localhost:3000/data',
-            selectedFile!, messageType, messageText);
+            selectedFile!, 'conversa', messageText);
 
         loadingPost = false;
         notifyListeners();
