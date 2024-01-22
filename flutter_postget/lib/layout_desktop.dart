@@ -20,6 +20,7 @@ class LayoutDesktop extends StatefulWidget {
 class _LayoutDesktopState extends State<LayoutDesktop> {
   final TextEditingController _controller = TextEditingController();
   final List<ChatMessage> _messages = [];
+  File mensajeJson = File('assets/data/conversa.json');
 
   void _sendMessage(
       AppData appData, String messageSender, String messageText) async {
@@ -40,7 +41,7 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
         // If the message is text, send it as 'conversa' type
         print("aaaaa");
         appData.load('POST',
-            selectedFile: null,
+            selectedFile: mensajeJson,
             messageType: 'conversa',
             messageText: messageText);
       } else {
@@ -51,7 +52,8 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
       }
     } catch (e) {
       if (kDebugMode) {
-        print("Excepción (sendMessage): $e");
+        //print("Excepción (sendMessage): $e");
+        print("Error al enviar mensaje");
       }
     }
     // Clear the text input
@@ -92,8 +94,8 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
         borderRadius:
             BorderRadius.circular(20.0), // Set your desired border radius
         border: Border.all(
-            color: const Color.fromARGB(
-                255, 204, 204, 204)), // Add a border for better visibility
+            color: Color.fromARGB(
+                255, 234, 213, 213)), // Add a border for better visibility
       ),
       child: Row(
         children: [

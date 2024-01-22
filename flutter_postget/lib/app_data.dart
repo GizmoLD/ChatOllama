@@ -68,7 +68,8 @@ class AppData with ChangeNotifier {
     var request = http.MultipartRequest('POST', Uri.parse(url));
 
     // Afegir les dades JSON com a part del formulari
-    request.fields['data'] = '{"type":"conversa"}';
+    request.fields['data'] =
+        '{"type": "$messageType", "message": "$messageText"}';
     // Adjunta l'arxiu com a part del formulari
     var stream = http.ByteStream(file.openRead());
     var length = await file.length();
