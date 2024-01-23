@@ -39,7 +39,6 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
     try {
       if (messageText.isNotEmpty) {
         // If the message is text, send it as 'conversa' type
-        print("aaaaa");
         appData.load('POST',
             selectedFile: mensajeJson,
             messageType: 'conversa',

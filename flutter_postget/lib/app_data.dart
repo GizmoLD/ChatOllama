@@ -63,8 +63,9 @@ class AppData with ChangeNotifier {
 
   // Funció per fer crides tipus 'POST' amb un arxiu adjunt,
   //i agafar la informació a mida que es va rebent
-  Future<String> loadHttpPostByChunks(
+  Future<void> loadHttpPostByChunks(
       String url, File file, String messageType, String messageText) async {
+    var completer = Completer<void>();
     var request = http.MultipartRequest('POST', Uri.parse(url));
 
     // Afegir les dades JSON com a part del formulari
@@ -80,16 +81,31 @@ class AppData with ChangeNotifier {
 
     var response = await request.send();
 
-    if (response.statusCode == 200) {
-      // La sol·licitud ha estat exitosa
-      var responseData = await response.stream.toBytes();
-      var responseString = utf8.decode(responseData);
-      return responseString;
-    } else {
-      // La sol·licitud ha fallat
-      throw Exception(
-          "Error del servidor (appData/loadHttpPostByChunks): ${response.reasonPhrase}");
+    try {
+      var response = await request.send();
+
+      dataPost = "";
+
+      // Listen to each chunk of data
+      response.stream.transform(utf8.decoder).listen(
+        (data) {
+          // Update dataPost with the latest data
+          dataPost += data;
+          notifyListeners();
+        },
+        onDone: () {
+          completer.complete();
+        },
+        onError: (error) {
+          completer.completeError(
+              "Error del servidor (appData/loadHttpPostByChunks): $error");
+        },
+      );
+    } catch (e) {
+      completer.completeError("Excepció (appData/loadHttpPostByChunks): $e");
     }
+
+    return completer.future;
   }
 
   // Funció per fer carregar dades d'un arxiu json de la carpeta 'assets'
@@ -118,8 +134,8 @@ class AppData with ChangeNotifier {
         loadingPost = true;
         notifyListeners();
 
-        dataPost = await loadHttpPostByChunks('http://localhost:3000/data',
-            selectedFile!, messageType, messageText);
+        // dataPost = await loadHttpPostByChunks('http://localhost:3000/data',
+        //     selectedFile!, messageType, messageText);
 
         loadingPost = false;
         notifyListeners();
@@ -127,11 +143,10 @@ class AppData with ChangeNotifier {
       case 'POST':
         loadingPost = true;
         notifyListeners();
-
-        dataPost = await loadHttpPostByChunks('http://localhost:3000/data',
-            selectedFile!, 'conversa', messageText);
-
+        await loadHttpPostByChunks('http://localhost:3000/data', selectedFile!,
+            messageType, messageText);
         loadingPost = false;
+        notifyListeners();
         notifyListeners();
         break;
       case 'FILE':
