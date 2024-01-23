@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -21,6 +22,25 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
   final TextEditingController _controller = TextEditingController();
   final List<ChatMessage> _messages = [];
   File mensajeJson = File('assets/data/conversa.json');
+  File imagenJson = File('assets/data/imatge.json');
+
+  void updateJsonFile(String messageText) {
+    // Read the existing JSON file
+    File jsonFile = File('assets/data/conversa.json');
+    String jsonContent = jsonFile.readAsStringSync();
+
+    // Parse the existing JSON content
+    Map<String, dynamic> jsonData = json.decode(jsonContent);
+
+    // Update the "prompt" field with the new message
+    jsonData['prompt'] = messageText;
+
+    // Convert the updated data back to JSON
+    String updatedJson = json.encode(jsonData);
+
+    // Write the updated JSON back to the file
+    jsonFile.writeAsStringSync(updatedJson);
+  }
 
   void _sendMessage(
       AppData appData, String messageSender, String messageText) async {
@@ -38,6 +58,10 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
 
     try {
       if (messageText.isNotEmpty) {
+        print("json1");
+        // Update the JSON file with the new message
+        updateJsonFile(messageText);
+        print("json2");
         // If the message is text, send it as 'conversa' type
         appData.load('POST',
             selectedFile: mensajeJson,
@@ -45,9 +69,8 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
             messageText: messageText);
       } else {
         // If the message is a file, send it as 'imatge' type
-        File selectedFile = await pickFile();
         appData.load('POST',
-            selectedFile: selectedFile, messageType: 'imatge', messageText: '');
+            selectedFile: imagenJson, messageType: 'imatge', messageText: '');
       }
     } catch (e) {
       if (kDebugMode) {

@@ -89,6 +89,8 @@ class AppData with ChangeNotifier {
       // Listen to each chunk of data
       response.stream.transform(utf8.decoder).listen(
         (data) {
+          print(
+              "RECIBIENDO RESPUESTA *****************************************");
           // Update dataPost with the latest data
           dataPost += data;
           notifyListeners();
