@@ -66,7 +66,7 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
             'http://localhost:3000/data', mensajeJson, 'conversa', messageText);
         // Use 'result' as needed
         ChatMessage serverResponseMessage =
-            ChatMessage(text: result, sender: "Server");
+            ChatMessage(text: result, sender: "Ollama");
         _messages.insert(0, serverResponseMessage);
       } else {
         // If the message is a file, send it as 'imatge' type
