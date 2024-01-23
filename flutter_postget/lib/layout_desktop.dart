@@ -59,23 +59,23 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
     try {
       if (messageText.isNotEmpty) {
         print("json1");
-        // Update the JSON file with the new message
         updateJsonFile(messageText);
         print("json2");
         // If the message is text, send it as 'conversa' type
-        appData.load('POST',
-            selectedFile: mensajeJson,
-            messageType: 'conversa',
-            messageText: messageText);
+        String result = await appData.loadHttpPostByChunks(
+            'http://localhost:3000/data', mensajeJson, 'conversa', messageText);
+        // Use 'result' as needed
+        ChatMessage serverResponseMessage =
+            ChatMessage(text: result, sender: "Server");
+        _messages.insert(0, serverResponseMessage);
       } else {
         // If the message is a file, send it as 'imatge' type
-        appData.load('POST',
-            selectedFile: imagenJson, messageType: 'imatge', messageText: '');
+        await appData.loadHttpPostByChunks(
+            'http://localhost:3000/data', imagenJson, 'imatge', '');
       }
     } catch (e) {
       if (kDebugMode) {
-        //print("Excepción (sendMessage): $e");
-        print("Error al enviar mensaje");
+        print("Error al enviar mensaje: $e");
       }
     }
     // Clear the text input

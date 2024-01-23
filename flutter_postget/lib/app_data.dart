@@ -63,9 +63,9 @@ class AppData with ChangeNotifier {
 
   // Funció per fer crides tipus 'POST' amb un arxiu adjunt,
   //i agafar la informació a mida que es va rebent
-  Future<void> loadHttpPostByChunks(
+  Future<String> loadHttpPostByChunks(
       String url, File file, String messageType, String messageText) async {
-    var completer = Completer<void>();
+    var completer = Completer<String>();
     var request = http.MultipartRequest('POST', Uri.parse(url));
 
     // Afegir les dades JSON com a part del formulari
@@ -79,8 +79,6 @@ class AppData with ChangeNotifier {
         contentType: MediaType('application', 'octet-stream'));
     request.files.add(multipartFile);
 
-    var response = await request.send();
-
     try {
       var response = await request.send();
 
@@ -91,12 +89,12 @@ class AppData with ChangeNotifier {
         (data) {
           print(
               "RECIBIENDO RESPUESTA *****************************************");
-          // Update dataPost with the latest data
           dataPost += data;
           notifyListeners();
+          print(data);
         },
         onDone: () {
-          completer.complete();
+          completer.complete(dataPost); // Complete with the accumulated data
         },
         onError: (error) {
           completer.completeError(
@@ -107,7 +105,7 @@ class AppData with ChangeNotifier {
       completer.completeError("Excepció (appData/loadHttpPostByChunks): $e");
     }
 
-    return completer.future;
+    return completer.future; // Return the future here
   }
 
   // Funció per fer carregar dades d'un arxiu json de la carpeta 'assets'
