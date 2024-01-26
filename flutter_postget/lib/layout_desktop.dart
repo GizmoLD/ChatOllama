@@ -188,8 +188,19 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("IetiChat"),
+        title: Center(
+          // This line centers the title horizontally
+          child: Text(
+            "IetiChat",
+            style: TextStyle(
+              // This line adjusts the font size and weight
+              fontSize: 24, // This line makes the title a little bigger
+              fontWeight: FontWeight.bold, // This line makes the title bold
+            ),
+          ),
+        ),
         centerTitle: true,
+        backgroundColor: Colors.blue,
       ),
       body: SafeArea(
         child: Column(
@@ -200,7 +211,7 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
                     left: 20, top: 20, right: 20, bottom: 10),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8.0),
-                  color: Colors.blueGrey[200],
+                  color: const Color.fromARGB(255, 227, 240, 247),
                 ),
                 child: ListView.builder(
                   reverse: true,
