@@ -29,7 +29,7 @@ class ChatMessage extends StatelessWidget {
                 margin: const EdgeInsets.only(top: 1.0),
                 child: Text(
                   text,
-                  overflow: TextOverflow.ellipsis, // Add overflow handling
+                  softWrap: true,
                 ),
               ),
             ],

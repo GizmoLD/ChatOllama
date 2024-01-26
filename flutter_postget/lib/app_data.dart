@@ -89,12 +89,12 @@ class AppData with ChangeNotifier {
         (data) {
           print("Recibiendo datos...");
           // Aquí rep cada un dels troços de dades que envia el servidor amb 'res.write'
-          // Decodificar el json de la respuesta para extrar el texto
-          // var jsonData = json.decode(data);
-          // String resposta = jsonData['text'];
-          // print(resposta);
+          //Decodificar el json de la respuesta para extrar el texto
+          var jsonData = json.decode(data);
+          String resposta = jsonData['conversa'];
+          print(resposta);
 
-          dataPost += data;
+          dataPost += resposta;
           notifyListeners();
         },
         onDone: () {
