@@ -48,7 +48,7 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
 
     ChatMessage _message =
         ChatMessage(text: messageText, sender: messageSender);
-
+    String resultData = "";
     // Update UI with the new message
     setState(() {
       if (messageText.isNotEmpty) {
@@ -58,12 +58,11 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
 
     try {
       if (messageText.isNotEmpty) {
-        print("json1");
         updateJsonFile(messageText);
-        print("json2");
         // If the message is text, send it as 'conversa' type
         String result = await appData.loadHttpPostByChunks(
             'http://localhost:3000/data', mensajeJson, 'conversa', messageText);
+
         // Use 'result' as needed
         ChatMessage serverResponseMessage =
             ChatMessage(text: result, sender: "Ollama");
