@@ -66,7 +66,7 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
         // Use 'result' as needed
         ChatMessage serverResponseMessage =
             ChatMessage(text: result, sender: "Ollama");
-        _messages.insert(0, serverResponseMessage);
+        _messages.insert(0, appData.dataPost);
       } else {
         // If the message is a file, send it as 'imatge' type
         await appData.loadHttpPostByChunks(
