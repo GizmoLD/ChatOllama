@@ -87,7 +87,7 @@ class AppData with ChangeNotifier {
       // Listen to each chunk of data
       response.stream.transform(utf8.decoder).listen(
         (data) {
-          print("Recibiendo datos...");
+          //print("Recibiendo datos...");
           // Aquí rep cada un dels troços de dades que envia el servidor amb 'res.write'
           //Decodificar el json de la respuesta para extrar el texto
           var jsonData = json.decode(data);

@@ -1,3 +1,5 @@
+// say 3 random english words. just the word, not definitions.
+
 import 'package:flutter/material.dart';
 
 class ChatMessage extends StatelessWidget {

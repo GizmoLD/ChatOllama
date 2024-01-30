@@ -46,27 +46,29 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
       AppData appData, String messageSender, String messageText) async {
     // Create a message object
 
-    ChatMessage _message =
-        ChatMessage(text: messageText, sender: messageSender);
-    String resultData = "";
+    ChatMessage message = ChatMessage(text: messageText, sender: messageSender);
+
     // Update UI with the new message
     setState(() {
       if (messageText.isNotEmpty) {
-        _messages.insert(0, _message);
+        _messages.insert(0, message);
       }
     });
-
+    String respuesta = "";
     try {
       if (messageText.isNotEmpty) {
         updateJsonFile(messageText);
+        // Use 'result' as needed
+        ChatMessage serverResponseMessage =
+            ChatMessage(text: respuesta, sender: "Ollama");
+
         // If the message is text, send it as 'conversa' type
         String result = await appData.loadHttpPostByChunks(
             'http://localhost:3000/data', mensajeJson, 'conversa', messageText);
 
-        // Use 'result' as needed
-        ChatMessage serverResponseMessage =
-            ChatMessage(text: result, sender: "Ollama");
-        _messages.insert(0, appData.dataPost);
+        setState(() {
+          _messages.insert(0, serverResponseMessage);
+        });
       } else {
         // If the message is a file, send it as 'imatge' type
         await appData.loadHttpPostByChunks(
@@ -77,8 +79,6 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
         print("Error al enviar mensaje: $e");
       }
     }
-    // Clear the text input
-    _controller.clear();
   }
 
   // Return a custom button
@@ -115,7 +115,7 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
         borderRadius:
             BorderRadius.circular(20.0), // Set your desired border radius
         border: Border.all(
-            color: Color.fromARGB(
+            color: const Color.fromARGB(
                 255, 234, 213, 213)), // Add a border for better visibility
       ),
       child: Row(
@@ -147,6 +147,7 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
             icon: const Icon(Icons.send),
             onPressed: () {
               _sendMessage(appData, "User", _controller.text);
+              _controller.clear();
             },
           ),
           IconButton(
@@ -187,7 +188,7 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Center(
+        title: const Center(
           // This line centers the title horizontally
           child: Text(
             "IetiChat",
