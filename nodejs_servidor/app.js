@@ -18,7 +18,7 @@ app.use(express.json());
 // Activar el servidor HTTP
 const httpServer = app.listen(port, appListen);
 async function appListen() {
-  console.log(`Listening for HTTP queries on: http://localhost:${port}`);
+  console.log(`Listening for HTTP queries on: http://127.0.0.1:${port}`);
 }
 
 // Tancar adequadament les connexions quan el servidor es tanqui
@@ -56,7 +56,7 @@ app.post("/data", upload.single("file"), async (req, res) => {
       console.log(objPost.message)
       try {
         const axiosResponse = await axios.post(
-          "http://localhost:11434/api/generate",
+          "http://127.0.0.1:11434/api/generate",
           fileContent,
           {
             responseType: "stream",
@@ -86,13 +86,12 @@ app.post("/data", upload.single("file"), async (req, res) => {
 
       try {
         const axiosResponse = await axios.post(
-          "http://localhost:11434/api/generate",
+          "http://127.0.0.1:11434/api/generate",
           fileContent,
           {
             responseType: "stream",
           }
         );
-
         res.writeHead(200, {
           "Content-Type": "application/json",
           "Transfer-Encoding": "chunked",
@@ -110,7 +109,6 @@ app.post("/data", upload.single("file"), async (req, res) => {
     } else {
       res.status(400).send("Falta el archivo adjunto para el tipo 'conversa'.");
     }
-    res.status(200).send("Solicitud de tipo 'imatge' recibida correctamente.");
   } else {
     res.status(400).send("Tipo de solicitud no reconocido.");
   }

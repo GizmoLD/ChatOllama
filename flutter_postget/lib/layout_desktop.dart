@@ -24,22 +24,43 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
   File mensajeJson = File('assets/data/conversa.json');
   File imagenJson = File('assets/data/imatge.json');
 
-  void updateJsonFile(String messageText) {
-    // Read the existing JSON file
-    File jsonFile = File('assets/data/conversa.json');
-    String jsonContent = jsonFile.readAsStringSync();
+  void updateJsonFile(String type, String messageText, {File? imagen}) {
+    if (type == "conversa") {
+      // Read the existing JSON file
+      File jsonFile = File('assets/data/conversa.json');
+      String jsonContent = jsonFile.readAsStringSync();
 
-    // Parse the existing JSON content
-    Map<String, dynamic> jsonData = json.decode(jsonContent);
+      // Parse the existing JSON content
+      Map<String, dynamic> jsonData = json.decode(jsonContent);
 
-    // Update the "prompt" field with the new message
-    jsonData['prompt'] = messageText;
+      // Update the "prompt" field with the new message
+      jsonData['prompt'] = messageText;
 
-    // Convert the updated data back to JSON
-    String updatedJson = json.encode(jsonData);
+      // Convert the updated data back to JSON
+      String updatedJson = json.encode(jsonData);
 
-    // Write the updated JSON back to the file
-    jsonFile.writeAsStringSync(updatedJson);
+      // Write the updated JSON back to the file
+      jsonFile.writeAsStringSync(updatedJson);
+    } else if (type == "imatge") {
+      // Read the existing JSON file
+      File jsonFile = File('assets/data/imatge.json');
+      String jsonContent = jsonFile.readAsStringSync();
+
+      // Parse the existing JSON content
+      Map<String, dynamic> jsonData = json.decode(jsonContent);
+
+      // encode the image to base64
+      String base64Image = base64Encode(imagen!.readAsBytesSync());
+
+      // Update the "images" field with the new message
+      jsonData['images'] = [base64Image];
+
+      // Convert the updated data back to JSON
+      String updatedJson = json.encode(jsonData);
+
+      // Write the updated JSON back to the file
+      jsonFile.writeAsStringSync(updatedJson);
+    }
   }
 
   void _sendMessage(
@@ -54,25 +75,19 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
         _messages.insert(0, message);
       }
     });
-    String respuesta = "";
     try {
       if (messageText.isNotEmpty) {
-        updateJsonFile(messageText);
-        // Use 'result' as needed
-        ChatMessage serverResponseMessage =
-            ChatMessage(text: respuesta, sender: "Ollama");
+        updateJsonFile('conversa', messageText);
 
         // If the message is text, send it as 'conversa' type
         String result = await appData.loadHttpPostByChunks(
             'http://localhost:3000/data', mensajeJson, 'conversa', messageText);
 
-        setState(() {
-          _messages.insert(0, serverResponseMessage);
-        });
-      } else {
-        // If the message is a file, send it as 'imatge' type
-        await appData.loadHttpPostByChunks(
-            'http://localhost:3000/data', imagenJson, 'imatge', '');
+        // Use 'result' as needed
+        ChatMessage serverResponseMessage =
+            ChatMessage(text: result, sender: "Ollama");
+
+        _messages.insert(0, serverResponseMessage);
       }
     } catch (e) {
       if (kDebugMode) {
@@ -80,8 +95,6 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
       }
     }
   }
-
-  // Return a custom button
 
   // Función para seleccionar un archivo
   Future<File> pickFile() async {
@@ -98,8 +111,11 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
   // Función para cargar el archivo seleccionado con una solicitud POST
   Future<void> uploadFile(AppData appData) async {
     try {
+      File imagen = await pickFile();
+      updateJsonFile('imatge', '', imagen: imagen);
+
       appData.load("POST",
-          selectedFile: await pickFile(), messageType: '', messageText: '');
+          selectedFile: imagenJson, messageType: 'image', messageText: '');
     } catch (e) {
       if (kDebugMode) {
         print("Excepción (uploadFile): $e");
@@ -125,6 +141,7 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
               controller: _controller,
               onSubmitted: (value) {
                 _sendMessage(appData, "User", _controller.text);
+                _controller.clear();
               },
               decoration: const InputDecoration(
                 contentPadding: EdgeInsets.symmetric(
