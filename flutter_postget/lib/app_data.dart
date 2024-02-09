@@ -4,23 +4,17 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_postget/chat_message.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
-/*
-- Convertir el mensaje en json
-- Enviar el json y abrirlo en el servidor
-
-*/
-
 class AppData with ChangeNotifier {
-  // Access appData globaly with:
-  // AppData appData = Provider.of<AppData>(context);
-  // AppData appData = Provider.of<AppData>(context, listen: false)
-
   bool loadingGet = false;
   bool loadingPost = false;
   bool loadingFile = false;
+  List<ChatMessage> messages = [];
+  String currentMessageText =
+      ''; // Variable para almacenar el texto del mensaje actual
 
   dynamic dataGet;
   dynamic dataPost;
@@ -91,14 +85,14 @@ class AppData with ChangeNotifier {
       // Listen to each chunk of data
       response.stream.transform(utf8.decoder).listen(
         (data) {
-          //print("Recibiendo datos...");
-          // Aquí rep cada un dels troços de dades que envia el servidor amb 'res.write'
-          //Decodificar el json de la respuesta para extrar el texto
           var jsonData = json.decode(data);
           String resposta = jsonData['conversa'];
           print(resposta);
 
           dataPost += resposta;
+          if (messages.isNotEmpty) {
+            messages[0] = messages[0].withText(dataPost);
+          }
           notifyListeners();
         },
         onDone: () {
@@ -141,11 +135,8 @@ class AppData with ChangeNotifier {
       case 'GET':
         loadingPost = true;
         notifyListeners();
-
-        dataPost = await loadHttpGetByChunks(
-          'http://localhost:3000/data',
-        );
-
+        await loadHttpGetByChunks(
+            'http://localhost:3000/llistat?cerca=motos&color=vermell');
         loadingPost = false;
         notifyListeners();
         break;

@@ -1,5 +1,3 @@
-// say 3 random english words. just the word, not definitions.
-
 import 'package:flutter/material.dart';
 
 class ChatMessage extends StatelessWidget {
@@ -8,6 +6,11 @@ class ChatMessage extends StatelessWidget {
 
   final String text;
   final String sender;
+
+  // Método para crear una instancia de ChatMessage con un texto actualizable
+  ChatMessage withText(String newText) {
+    return ChatMessage(key: key, sender: sender, text: newText);
+  }
 
   @override
   Widget build(BuildContext context) {

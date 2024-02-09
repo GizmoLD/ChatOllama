@@ -20,7 +20,6 @@ class LayoutDesktop extends StatefulWidget {
 
 class _LayoutDesktopState extends State<LayoutDesktop> {
   final TextEditingController _controller = TextEditingController();
-  final List<ChatMessage> _messages = [];
   File mensajeJson = File('assets/data/conversa.json');
   File imagenJson = File('assets/data/imatge.json');
 
@@ -68,13 +67,16 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
     // Create a message object
 
     ChatMessage message = ChatMessage(text: messageText, sender: messageSender);
+    ChatMessage messageBot = ChatMessage(text: "", sender: "Ollama");
 
     // Update UI with the new message
     setState(() {
       if (messageText.isNotEmpty) {
-        _messages.insert(0, message);
+        appData.messages.insert(0, message);
+        appData.messages.insert(0, messageBot);
       }
     });
+
     try {
       if (messageText.isNotEmpty) {
         updateJsonFile('conversa', messageText);
@@ -87,7 +89,7 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
         ChatMessage serverResponseMessage =
             ChatMessage(text: result, sender: "Ollama");
 
-        _messages.insert(0, serverResponseMessage);
+        //appData.messages.insert(0, serverResponseMessage);
       }
     } catch (e) {
       if (kDebugMode) {
@@ -206,13 +208,11 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
     return Scaffold(
       appBar: AppBar(
         title: const Center(
-          // This line centers the title horizontally
           child: Text(
             "IetiChat",
             style: TextStyle(
-              // This line adjusts the font size and weight
-              fontSize: 24, // This line makes the title a little bigger
-              fontWeight: FontWeight.bold, // This line makes the title bold
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),
@@ -233,9 +233,9 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
                 child: ListView.builder(
                   reverse: true,
                   padding: Vx.m8,
-                  itemCount: _messages.length,
+                  itemCount: appData.messages.length,
                   itemBuilder: (context, index) {
-                    return _messages[index];
+                    return appData.messages[index];
                   },
                 ),
               ),
