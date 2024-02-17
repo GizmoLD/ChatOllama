@@ -23,10 +23,11 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
   File mensajeJson = File('assets/data/conversa.json');
   File imagenJson = File('assets/data/imatge.json');
 
-  void updateJsonFile(String type, String messageText, {File? imagen}) {
+  Future<void> updateJsonFile(String type, String messageText) async {
     if (type == "conversa") {
       // Read the existing JSON file
       File jsonFile = File('assets/data/conversa.json');
+
       String jsonContent = jsonFile.readAsStringSync();
 
       // Parse the existing JSON content
@@ -42,23 +43,26 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
       jsonFile.writeAsStringSync(updatedJson);
     } else if (type == "imatge") {
       // Read the existing JSON file
-      File jsonFile = File('assets/data/imatge.json');
-      String jsonContent = jsonFile.readAsStringSync();
+      //File jsonFile = File('assets/data/imatge.json');
+      File imagen = File('assets/data/imatge.png');
+      String jsonContent = imagenJson.readAsStringSync();
 
+      final imageBytes = await imagen.readAsBytes();
+      final base64Image = base64Encode(imageBytes);
+
+      print("Hola1");
       // Parse the existing JSON content
       Map<String, dynamic> jsonData = json.decode(jsonContent);
-
-      // encode the image to base64
-      String base64Image = base64Encode(imagen!.readAsBytesSync());
-
+      print("Hola2");
       // Update the "images" field with the new message
       jsonData['images'] = [base64Image];
+      print("Hola3");
 
       // Convert the updated data back to JSON
       String updatedJson = json.encode(jsonData);
 
       // Write the updated JSON back to the file
-      jsonFile.writeAsStringSync(updatedJson);
+      imagenJson.writeAsStringSync(updatedJson);
     }
   }
 
@@ -66,15 +70,20 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
       AppData appData, String messageSender, String messageText) async {
     // Create a message object
 
-    ChatMessage message = ChatMessage(text: messageText, sender: messageSender);
+    ChatMessage messageChat =
+        ChatMessage(text: messageText, sender: messageSender);
+    ChatMessage messageImage =
+        ChatMessage(text: "Describe la imagen", sender: messageSender);
     ChatMessage messageBot = ChatMessage(text: "", sender: "Ollama");
 
     // Update UI with the new message
     setState(() {
-      if (messageText.isNotEmpty) {
-        appData.messages.insert(0, message);
-        appData.messages.insert(0, messageBot);
+      if (messageText.isEmpty) {
+        appData.messages.insert(0, messageImage);
+      } else {
+        appData.messages.insert(0, messageChat);
       }
+      appData.messages.insert(0, messageBot);
     });
 
     try {
@@ -84,6 +93,16 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
         // If the message is text, send it as 'conversa' type
         String result = await appData.loadHttpPostByChunks(
             'http://localhost:3000/data', mensajeJson, 'conversa', messageText);
+
+        // Use 'result' as needed
+        ChatMessage serverResponseMessage =
+            ChatMessage(text: result, sender: "Ollama");
+
+        //appData.messages.insert(0, serverResponseMessage);
+      } else {
+        // If the message is an image, send it as 'imatge' type
+        String result = await appData.loadHttpPostByChunks(
+            'http://localhost:3000/data', imagenJson, 'imatge', messageText);
 
         // Use 'result' as needed
         ChatMessage serverResponseMessage =
@@ -114,10 +133,17 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
   Future<void> uploadFile(AppData appData) async {
     try {
       File imagen = await pickFile();
-      updateJsonFile('imatge', '', imagen: imagen);
-
-      appData.load("POST",
-          selectedFile: imagenJson, messageType: 'image', messageText: '');
+      // Save the image in the 'assets/data' folder
+      File destinationFile = File('assets/data/imatge.png');
+      if (destinationFile.existsSync()) {
+        // delete the file
+        destinationFile.deleteSync();
+        imagen.copy('assets/data/imatge.png');
+        _sendMessage(appData, "User", "");
+      } else {
+        imagen.copy('assets/data/imatge.png');
+        _sendMessage(appData, "User", "");
+      }
     } catch (e) {
       if (kDebugMode) {
         print("Excepción (uploadFile): $e");
@@ -158,8 +184,7 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
             icon: const Icon(Icons.stop),
             onPressed: () {
               // Enviar un GET para parar la respuesta
-              appData.load("GET",
-                  selectedFile: null, messageType: '', messageText: '');
+              appData.load("GET", messageType: '', messageText: '');
             },
           ),
           IconButton(

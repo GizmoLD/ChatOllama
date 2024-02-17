@@ -86,8 +86,8 @@ class AppData with ChangeNotifier {
       response.stream.transform(utf8.decoder).listen(
         (data) {
           var jsonData = json.decode(data);
-          String resposta = jsonData['conversa'];
-          print(resposta);
+          String resposta = jsonData[messageType];
+          print(data);
 
           dataPost += resposta;
           if (messages.isNotEmpty) {
@@ -133,11 +133,12 @@ class AppData with ChangeNotifier {
       required String messageText}) async {
     switch (type) {
       case 'GET':
-        loadingPost = true;
+        print("Enviando GET");
+        loadingGet = true;
         notifyListeners();
         await loadHttpGetByChunks(
             'http://localhost:3000/llistat?cerca=motos&color=vermell');
-        loadingPost = false;
+        loadingGet = false;
         notifyListeners();
         break;
       case 'POST':
