@@ -119,7 +119,10 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
 
   // Función para seleccionar un archivo
   Future<File> pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['png'],
+    );
 
     if (result != null) {
       File file = File(result.files.single.path!);
